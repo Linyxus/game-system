@@ -4,12 +4,14 @@
 #include <vector>
 #include <initializer_list>
 #include <iostream>
+#include <algorithm>
 using namespace std;
 
 class Map;
 struct Position;
 class Node;
 class Road;
+struct Path;
 
 struct Position
 {
@@ -42,10 +44,18 @@ public:
 	void addNodes(initializer_list<int> l) {
 		m_nodes.insert(m_nodes.end(), l.begin(), l.end());
 	}
+	int greaterNode() const { return max(m_nodes[0], m_nodes[1]); }
+	int smallerNode() const { return min(m_nodes[0], m_nodes[1]); }
+	int anotherNode(int id) const { return (id == greaterNode()) ? smallerNode() : greaterNode(); }
 private:
 	int m_id;
 	int m_len;
 	vector<int> m_nodes;
+};
+
+struct Path
+{
+	vector<Position> positions;
 };
 
 ostream& operator<<(ostream& out, const Map& map);
@@ -57,7 +67,16 @@ public:
 	Map(const string& filename);
 	void loadFromFile(const string& filename);
 	void loadFromString(const string& str);
+	Path caculatePath(Position s, Position e);
+	Path queryPath(Position s, Position e, int step);
+	int pathLen(const Path&) const;
+	Path spfa(int s, int dest);
+	Node commonNode(Road r1, Road r2) const;
+	int commonRoad(Node n1, Node n2) const;
 private:
+	int* d;
+	int* p;
+	int* inq;
 	vector<Road> m_roads;
 	vector<Node> m_nodes;
 };

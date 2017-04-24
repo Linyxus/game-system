@@ -21,12 +21,24 @@
     <ClCompile Include="map.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="place.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="manager.cc">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="car.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="map.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="place.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="manager.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
