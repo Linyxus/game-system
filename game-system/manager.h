@@ -25,5 +25,6 @@ class Manager
 public:
 	Manager();
 	Random random;
+	void run();
 private:
 };

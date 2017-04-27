@@ -1,14 +1,26 @@
 #include "map.h"
 #include <sstream>
-#include <cstring>
 #include <queue>
 #include <fstream>
+#include <algorithm>
+#include <iostream>
 using namespace std;
 
 /* Map */
 Map::Map(const string& filename)
 {
 	loadFromFile(filename);
+}
+
+Position Map::nodeToPosition(Node node) const
+{
+    Position pos;
+    pos.rid = node.roads()[0];
+    if (m_roads[pos.rid].smallerNode() == node.id())
+        pos.rpos = 0;
+    else
+        pos.rpos = m_roads[pos.rid].len();
+    return pos;
 }
 
 void Map::loadFromFile(const string& filename)
@@ -40,19 +52,18 @@ void Map::loadFromString(const string& str)
 
 Path Map::spfa(int s, int dest)
 {
-	if (dest == s)
-		return Path();
+	if (dest == s) {
+        Path p;
+        p.positions.push_back(nodeToPosition(m_nodes[s]));
+        return p;
+	}
 	queue<int> q;
 	int n = m_nodes.size();
-	if (d == nullptr)
-		d = new int[n];
-	if (p == nullptr)
-		p = new int[n];
-	memset(p, -1, sizeof p);
-	memset(inq, 0, sizeof inq);
-	inq = new int[n];
+	vector<int> d, p, inq;
 	for (int i = 0; i < n; i++) {
-		d[i] = -1;
+		d.push_back(-1);
+		p.push_back(-1);
+		inq.push_back(0);
 	}
 	d[s] = 0;
 	inq[s] = true;
@@ -80,6 +91,7 @@ Path Map::spfa(int s, int dest)
 		nodes.push_back(u);
 	}
 	nodes.push_back(s);
+	/*
 	for (int i = nodes.size() - 1; i > 0; i--) {
 		int r = commonRoad(Node(m_nodes[nodes[i]]), Node(m_nodes[nodes[i - 1]]));
 		Position pos;
@@ -95,6 +107,9 @@ Path Map::spfa(int s, int dest)
 		pos.rid = path.positions[path.positions.size() - 1].rid;
 		pos.rpos = m_roads[path.positions[path.positions.size() - 1].rid].len();
 		path.positions.push_back(pos);
+	}*/
+	for (int i = nodes.size() - 1; i >= 0; i--) {
+        path.positions.push_back(nodeToPosition(m_nodes[nodes[i]]));
 	}
 	return path;
 }
@@ -116,8 +131,10 @@ Node Map::commonNode(Road r1, Road r2) const
 int Map::commonRoad(Node n1, Node n2) const
 {
 	int n = m_roads.size();
-	int* vis = new int[n];
-	memset(vis, 0, sizeof vis);
+	vector<int> vis;
+	for (int i = 0; i < n; i++) {
+        vis.push_back(0);
+	}
 	for (int i = 0; i < n1.roads().size(); i++) {
 		vis[n1.roads()[i]] = 1;
 	}
@@ -126,6 +143,26 @@ int Map::commonRoad(Node n1, Node n2) const
 			return n2.roads()[i];
 	}
 	return -1;
+}
+
+int Map::posNodeId(Position pos) const
+{
+	Road road = m_roads[pos.rid];
+	if (pos.rpos == 0)
+		return road.smallerNode();
+	else if (pos.rpos == road.len())
+		return road.greaterNode();
+	else
+		return -1;
+}
+
+void _DISPLAY_PATH(const Path& _p)
+{
+    cout << "## Debug # Path" << endl;
+    for (int i = 0; i < _p.positions.size(); i++) {
+        cout << "Position #RID " << _p.positions[i].rid << " #RPOS " << _p.positions[i].rpos << endl;
+    }
+    cout << endl;
 }
 
 Path Map::caculatePath(Position s, Position e)
@@ -143,10 +180,14 @@ Path Map::caculatePath(Position s, Position e)
 	Path minPath;
 	for (int i = 0; i < paths.size(); i++) {
 		Path path = paths[i];
-		path.positions.insert(path.positions.begin(), s);
-		path.positions.push_back(e);
+		if (posNodeId(path.positions[0]) != posNodeId(s)) {
+            path.positions.insert(path.positions.begin(), s);
+		}
+		if (posNodeId(path.positions[path.positions.size()-1]) != posNodeId(e)) {
+            path.positions.push_back(e);
+		}
 		int len = pathLen(path);
-		if (minlen == -1 || minlen < len) {
+		if (minlen == -1 || minlen > len) {
 			minlen = len;
 			minPath = path;
 		}
@@ -157,6 +198,8 @@ Path Map::caculatePath(Position s, Position e)
 Path Map::queryPath(Position s, Position e, int step)
 {
 	Path path = caculatePath(s, e);
+	if (pathLen(path) <= step)
+		return path;
 	Path ret;
 	int cur = 0;
 	while (pathLen(ret) < step) {
@@ -166,7 +209,7 @@ Path Map::queryPath(Position s, Position e, int step)
 	return ret;
 }
 
-int Map::pathLen(const Path &p) const //caculate the path length
+int Map::pathLen(const Path &p) const //calculate the path length
 {
 	int ret = 0;
 	vector<Position> poss = p.positions;
@@ -175,28 +218,48 @@ int Map::pathLen(const Path &p) const //caculate the path length
 	Position prev = poss[0];
 	for (int i = 1; i < poss.size(); i++) {
 		Position pos = poss[i];
-		Road r1 = this->m_roads[prev.rid];
-		Road r2 = this->m_roads[pos.rid];
-		Node node = commonNode(r1, r2);
-		if (node.id() == -1)
-			return -1;
-		int len1, len2;
-		if (node.id() == r1.greaterNode()) {
-			len1 = r1.len() - prev.rpos;
-		}
-		else {
-			len1 = prev.rpos;
-		}
-		if (node.id() == r2.greaterNode()) {
-			len2 = r2.len() - pos.rpos;
-		}
-		else {
-			len2 = pos.rpos;
-		}
-		ret += len1 + len2;
+		ret += lenBetweenPos(prev, pos);
 		prev = pos;
 	}
 	return ret;
+}
+
+int Map::lenBetweenPos(Position pos1, Position pos2) const
+{
+	int nid1 = posNodeId(pos1);
+	int nid2 = posNodeId(pos2);
+	if (nid1 != -1 && nid2 != -1) {
+		int rid = commonRoad(m_nodes[nid1], m_nodes[nid2]);
+		return m_roads[rid].len();
+	}
+	else if (nid1 == -1 && nid2 == -1) {
+		if (pos1.rid != pos2.rid) {
+			throw string("function lenBetweenPos: Positions not legal");
+		}
+		Road road = m_roads[pos1.rid];
+		return abs(pos1.rpos - pos2.rpos);
+	}
+	else {
+		if (nid1 == -1) {
+			swap(nid1, nid2);
+			swap(pos1, pos2);
+		}
+		Node node = m_nodes[nid1];
+		int rid = -1;
+		for (int i = 0; i < node.roads().size(); i++) {
+			if (node.roads()[i] == pos2.rid)
+				rid = pos2.rid;
+		}
+		if (rid == -1) {
+			throw string("function lenBetweenPos: Positions not legal");
+		}
+		if (node.id() == m_roads[rid].greaterNode()) {
+			return m_roads[rid].len() - pos2.rpos;
+		}
+		else {
+			return pos2.rpos;
+		}
+	}
 }
 
 ostream & operator<<(ostream & out, const Map & map)

@@ -59,20 +59,27 @@ struct Path
 };
 
 ostream& operator<<(ostream& out, const Map& map);
+void _DISPLAY_PATH(const Path& _p);
 
 class Map
 {
 	friend ostream& operator<<(ostream& out, const Map& map);
 public:
 	Map(const string& filename);
+	Map(){};
 	void loadFromFile(const string& filename);
 	void loadFromString(const string& str);
 	Path caculatePath(Position s, Position e);
 	Path queryPath(Position s, Position e, int step);
 	int pathLen(const Path&) const;
+	int lenBetweenPos(Position pos1, Position pos2) const;
 	Path spfa(int s, int dest);
 	Node commonNode(Road r1, Road r2) const;
 	int commonRoad(Node n1, Node n2) const;
+	int posNodeId(Position pos) const;
+	vector<Road> roads() const { return m_roads; }
+	vector<Node> nodes() const { return m_nodes; }
+	Position nodeToPosition(Node node) const;
 private:
 	int* d;
 	int* p;

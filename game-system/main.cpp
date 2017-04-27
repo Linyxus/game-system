@@ -1,24 +1,24 @@
 #include <iostream>
 #include "map.h"
-#include "manager.h"
 using namespace std;
 
 int main()
 {
 	cout << "Hello!" << endl
 		<< "Welcome to Game System!" << endl;
-	Map map("");
-	Manager manager;
+	Map map;
 	string str;
-	str = "3\n0 1 4\n0 2 1\n1 2 3";
+	str = "4\n0 1 1\n0 2 4\n1 2 2\n2 3 3";
 	map.loadFromString(str);
 	cout << map << endl;
-	int sum = 0;
-	for (int i = 0; i < 1000; i++) {
-		if (manager.random.hitted(50))
-			sum++;
+	Position pos1, pos2;
+	pos1.rid = 1; pos1.rpos = 1;
+	pos2.rid = 3; pos2.rpos = 3;
+	Path path = map.caculatePath(pos1, pos2);
+	for (int i = 0; i < path.positions.size(); i++) {
+        Position pos = path.positions[i];
+        cout << pos.rid << " " << pos.rpos << endl;
 	}
-	cout << sum << endl;
 
 	cin.get();
 	return 0;
