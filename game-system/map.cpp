@@ -205,7 +205,58 @@ Path Map::queryPath(Position s, Position e, int step)
 	while (pathLen(ret) < step) {
 		ret.positions.push_back(path.positions[cur++]);
 	}
-	ret.positions[ret.positions.size() - 1].rpos += step - pathLen(ret);
+	if (pathLen(ret) == step)
+		return ret;
+	Position pathend = *(--ret.positions.end());
+	ret.positions.pop_back();
+	Position npos = *(--ret.positions.end());
+	if (posNodeId(pathend) != -1 && posNodeId(npos) != -1) {
+		Road r = m_roads[commonRoad(m_nodes[posNodeId(pathend)], m_nodes[posNodeId(npos)])];
+		if (r.smallerNode() == posNodeId(npos)) {
+			npos.rid = r.id();
+			npos.rpos = step - pathLen(ret);
+		}
+		else {
+			npos.rid = r.id();
+			npos.rpos = r.len() - (step - pathLen(ret));
+		}
+		ret.positions.push_back(npos);
+	}
+	else if (posNodeId(pathend) == -1 && posNodeId(npos) == -1) {
+		npos.rpos += pathend.rpos - npos.rpos;
+		ret.positions.push_back(npos);
+	}
+	else {
+		if (posNodeId(pathend) == -1) {
+			Node node = m_nodes[posNodeId(npos)];
+			Road road = m_roads[pathend.rid];
+			if (node.id() == road.smallerNode()) {
+				npos.rid = pathend.rid;
+				npos.rpos = step - pathLen(ret);
+			}
+			else if (node.id() == road.greaterNode()) {
+				npos.rid = pathend.rid;
+				npos.rpos = road.len() - (step - pathLen(ret));
+			}
+			else {
+				throw string("queryPath: path not legal. The two positions beside are not on the same raod.");
+			}
+		}
+		else {
+			Node node = m_nodes[posNodeId(pathend)];
+			Road road = m_roads[npos.rid];
+			if (node.id() == road.smallerNode()) {
+				npos.rpos -= step - pathLen(ret);
+			}
+			else if (node.id() == road.greaterNode()) {
+				npos.rpos += step - pathLen(ret);
+			}
+			else {
+				throw string("queryPath: path not legal. The two positions beside are not on the same raod.");
+			}
+		}
+		ret.positions.push_back(npos);
+	}
 	return ret;
 }
 

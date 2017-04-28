@@ -13,12 +13,13 @@ int main()
 	cout << map << endl;
 	Position pos1, pos2;
 	pos1.rid = 1; pos1.rpos = 1;
-	pos2.rid = 3; pos2.rpos = 3;
-	Path path = map.caculatePath(pos1, pos2);
+	pos2.rid = 1; pos2.rpos = 3;
+	Path path = map.queryPath(pos1, pos2, 1);
 	for (int i = 0; i < path.positions.size(); i++) {
         Position pos = path.positions[i];
         cout << pos.rid << " " << pos.rpos << endl;
 	}
+	cout << map.pathLen(path) << endl;
 
 	cin.get();
 	return 0;
