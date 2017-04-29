@@ -1,6 +1,6 @@
 #include <iostream>
 #include "map.h"
-#include "place.h"
+#include "manager.h"
 using namespace std;
 
 int main()

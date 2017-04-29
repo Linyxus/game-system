@@ -5,7 +5,7 @@
 #include <iostream>
 #include "map.h"
 #include "car.h"
-#include "manager.h"
+class Manager;
 using namespace std;
 
 class Punisher;
