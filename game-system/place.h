@@ -3,27 +3,30 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include "map.h"
 using namespace std;
 
 class Place;
 class Range;
+class CrossRoad;
+class Slower;
 
 class Range
 {
 public:
-	Range() {}
-	Range(string str) {};
-	void loadFromString(string str) {};
-	//bool in(Postion) const;
+	Range(Map* parent);
+	void loadFromString(string str);
+	bool in(Position) const;
 private:
-	//vector<Node> m_nodes;
-	//vector<Road> m_roads;
+	Map* m_parent;
+	vector<int> m_nodes;
+	vector<int> m_roads;
 };
 
 class Place
 {
 public:
-	Place() {}
+	Place(Map* parent) : m_range(parent) {}
 	//void loadRange(string str);
 	virtual void onPassBy() = 0;
 	virtual void onVisited() = 0;

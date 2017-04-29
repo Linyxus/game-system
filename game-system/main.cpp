@@ -1,5 +1,6 @@
 #include <iostream>
 #include "map.h"
+#include "place.h"
 using namespace std;
 
 int main()
@@ -11,15 +12,12 @@ int main()
 	str = "4\n0 1 1\n0 2 4\n1 2 2\n2 3 3";
 	map.loadFromString(str);
 	cout << map << endl;
-	Position pos1, pos2;
-	pos1.rid = 1; pos1.rpos = 1;
-	pos2.rid = 1; pos2.rpos = 3;
-	Path path = map.queryPath(pos1, pos2, 1);
-	for (int i = 0; i < path.positions.size(); i++) {
-        Position pos = path.positions[i];
-        cout << pos.rid << " " << pos.rpos << endl;
-	}
-	cout << map.pathLen(path) << endl;
+	//Place::Range Unit Test
+	Range range(&map);
+	range.loadFromString("2 1 2 0 1");
+	Position pos;
+	pos.rid = 0; pos.rpos = 1;
+	cout << range.in(pos) << endl;
 
 	cin.get();
 	return 0;
