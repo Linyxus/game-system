@@ -91,23 +91,6 @@ Path Map::spfa(int s, int dest)
 		nodes.push_back(u);
 	}
 	nodes.push_back(s);
-	/*
-	for (int i = nodes.size() - 1; i > 0; i--) {
-		int r = commonRoad(Node(m_nodes[nodes[i]]), Node(m_nodes[nodes[i - 1]]));
-		Position pos;
-		pos.rid = r;
-		if (nodes[i] == m_roads[r].greaterNode())
-			pos.rpos = m_roads[r].len();
-		else
-			pos.rpos = 0;
-		path.positions.push_back(pos);
-	}
-	if (path.positions[path.positions.size() - 1].rpos == 0) {
-		Position pos;
-		pos.rid = path.positions[path.positions.size() - 1].rid;
-		pos.rpos = m_roads[path.positions[path.positions.size() - 1].rid].len();
-		path.positions.push_back(pos);
-	}*/
 	for (int i = nodes.size() - 1; i >= 0; i--) {
         path.positions.push_back(nodeToPosition(m_nodes[nodes[i]]));
 	}
