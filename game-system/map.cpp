@@ -23,6 +23,30 @@ Position Map::nodeToPosition(Node node) const
     return pos;
 }
 
+bool Map::posInPath(Position position, Path path) const
+{
+	if (path.positions.size() == 0) {
+		return false;
+	}
+	if (path.positions.size() == 1) {
+		Position pos = path.positions[0];
+		if (posNodeId(position) == -1 && posNodeId(pos) == -1) {
+			return (position.rid == pos.rid) && (position.rpos == pos.rpos);
+		}
+		if (posNodeId(position) != -1 && posNodeId(pos) != -1) {
+			return posNodeId(position) == posNodeId(pos);
+		}
+		else {
+			return false;
+		}
+	}
+	if (path.positions.size() == 2) {
+		Position pos1 = path.positions[0];
+		Position pos2 = path.positions[1];
+		//...
+	}
+}
+
 void Map::loadFromFile(const string& filename)
 {
 	std::ifstream t(filename);

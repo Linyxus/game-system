@@ -4,12 +4,24 @@
 #include <string>
 #include <iostream>
 #include "map.h"
+#include "car.h"
+#include "manager.h"
 using namespace std;
 
+class Punisher;
 class Place;
 class Range;
 class CrossRoad;
 class Slower;
+
+class Punisher
+{
+public:
+	Punisher(Manager* manager);
+	void common(Car);
+private:
+	Manager* m_manager;
+};
 
 class Range
 {
@@ -26,24 +38,24 @@ private:
 class Place
 {
 public:
-	Place(Map* parent) : m_range(parent) {}
-	//void loadRange(string str);
-	virtual void onPassBy() = 0;
-	virtual void onVisited() = 0;
-	bool in() const {
-		return true;
-	}
+	Place(Map* parent, Punisher* punisher) : m_range(parent), punish(punisher) {}
+	void loadRange(string str);
+	virtual void onPass(Car, Path) = 0;
+	virtual void onVisit(Car, Path) = 0;
+	virtual void onLeave(Car, Path) = 0;
+	bool in(Position) const;
 protected:
 	Range m_range;
+	Punisher* punish;
 };
 
 class CrossRoad : public Place
 {
 public:
-	void onPassBy() {
+	void onPass(Car, Path) {
 		cout << "A car pass by CrossRoad!" << endl;
 	}
-	void onVisited() {
+	void onVisited(Car, Path) {
 		m_range.loadFromString("123");
 		cout << "A car visited CrossRoad!" << endl;
 	}
@@ -52,10 +64,10 @@ public:
 class Slower : public Place
 {
 public:
-	void onPassBy() {
+	void onPass(Car, Path) {
 		cout << "A car pass by Slower!" << endl;
 	}
-	void onVisited() {
+	void onVisit(Car, Path) {
 		m_range.loadFromString("123");
 		cout << "A car visited Slower!" << endl;
 	}

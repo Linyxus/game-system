@@ -22,6 +22,7 @@ struct Position
 class Node
 {
 public:
+	Node() {}
 	Node(int id) { m_id = id; }
 	Node(int id, initializer_list<int> l) { m_id = id; addRoads(l); }
 	vector<int> roads() const { return m_roads; }
@@ -37,6 +38,7 @@ private:
 class Road
 {
 public:
+	Road() {}
 	Road(int id, int len, initializer_list<int> l) { m_id = id; m_len = len; addNodes(l); }
 	vector<int> nodes() const { return m_nodes; }
 	int id() const { return m_id; }
@@ -80,6 +82,7 @@ public:
 	vector<Road> roads() const { return m_roads; }
 	vector<Node> nodes() const { return m_nodes; }
 	Position nodeToPosition(Node node) const;
+	bool posInPath(Position, Path) const;
 private:
 	int* d;
 	int* p;

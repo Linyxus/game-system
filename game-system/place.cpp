@@ -38,3 +38,22 @@ bool Range::in(Position pos) const
 	else
 		return m_nodes[m_parent->posNodeId(pos)];
 }
+
+void Place::loadRange(string str)
+{
+	m_range.loadFromString(str);
+}
+
+bool Place::in(Position pos) const
+{
+	return m_range.in(pos);
+}
+
+Punisher::Punisher(Manager * manager)
+{
+	m_manager = manager;
+}
+
+void Punisher::common(Car car)
+{
+}
