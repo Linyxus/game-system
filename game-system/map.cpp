@@ -43,8 +43,63 @@ bool Map::posInPath(Position position, Path path) const
 	if (path.positions.size() == 2) {
 		Position pos1 = path.positions[0];
 		Position pos2 = path.positions[1];
-		//...
+		int nid1 = posNodeId(pos1);
+		int nid2 = posNodeId(pos2);
+		if (posNodeId(position) != -1) {
+			return (posNodeId(position) == nid1) || (posNodeId(position) == nid2);
+		}
+		if (nid1 != -1 && nid2 != -1) {
+			int rid = commonRoad(m_nodes[nid1], m_nodes[nid2]);
+			return position.rid == rid;
+		}
+		else if (nid1 == -1 && nid2 == -1) {
+			if (pos1.rid != pos2.rid) {
+				throw string("Map::posInPath illigal positions besides");
+			}
+			if (position.rid != pos1.rid) {
+				return false;
+			}
+			else {
+				return (position.rpos >= min(pos1.rpos, pos2.rpos)) && (position.rpos <= max(pos1.rpos, pos2.rpos));
+			}
+		}
+		else {
+			Node node;
+			Position pos;
+			Road road;
+			if (posNodeId(pos1) != -1) {
+				node = m_nodes[posNodeId(pos1)];
+				pos = pos2;
+				road = m_roads[pos.rid];
+			}
+			else {
+				node  = m_nodes[posNodeId(pos2)];
+				pos = pos1;
+				road = m_roads[pos.rid];
+			}
+			if (position.rid != road.id()) {
+				return false;
+			}
+			if (node.id() == road.smallerNode()) {
+				return position.rpos <= pos.rpos;
+			}
+			else if (node.id() == road.greaterNode()) {
+				return position.rpos >= pos.rpos;
+			}
+			else {
+				throw string("Map::posInPath: illigal positions besides");
+			}
+		}
 	}
+	//here, path length >= 3
+	for (int i = 0; i < path.positions.size() - 1; i++) {
+		Path t;
+		t.positions.push_back(path.positions[0]);
+		t.positions.push_back(path.positions[1]);
+		if (posInPath(position, t))
+			return true;
+	}
+	return false;
 }
 
 void Map::loadFromFile(const string& filename)
