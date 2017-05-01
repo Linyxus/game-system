@@ -23,8 +23,14 @@ private:
 class Manager
 {
 public:
+	enum PlaceStatus {STAY, LEAVE, VISIT, PASS, NONE};
 	Manager();
 	Random random;
 	void run();
+	PlaceStatus getPlaceStatus(Place*, Path) const;
+	PlaceStatus getPlaceStatus(Range, Path) const;
+	void setMap(Map* map) { m_map = map; }
+	Map* map() { return m_map; }
 private:
+	Map* m_map;
 };

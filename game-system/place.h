@@ -40,13 +40,24 @@ class Place
 public:
 	Place(Map* parent, Punisher* punisher) : m_range(parent), punish(punisher) {}
 	void loadRange(string str);
+	Range range() const { return m_range; }
 	virtual void onPass(Car, Path) = 0;
 	virtual void onVisit(Car, Path) = 0;
 	virtual void onLeave(Car, Path) = 0;
+	virtual void onStay(Car, Path) = 0;
 	bool in(Position) const;
 protected:
 	Range m_range;
 	Punisher* punish;
+};
+
+class TestPlace : public Place
+{
+public:
+	virtual void onPass(Car, Path) {}
+	virtual void onVisit(Car, Path) {}
+	virtual void onLeave(Car, Path) {}
+	virtual void onStay(Car, Path) {}
 };
 
 class CrossRoad : public Place
