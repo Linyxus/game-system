@@ -83,6 +83,7 @@ public:
 	vector<Node> nodes() const { return m_nodes; }
 	Position nodeToPosition(Node node) const;
 	bool posInPath(Position, Path) const;
+	bool posEqual(Position, Position) const;
 private:
 	int* d;
 	int* p;

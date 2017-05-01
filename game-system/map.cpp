@@ -102,6 +102,19 @@ bool Map::posInPath(Position position, Path path) const
 	return false;
 }
 
+bool Map::posEqual(Position l, Position r) const
+{
+	if (posNodeId(l) == -1 && posNodeId(r) == -1) {
+		return (l.rid == r.rid) && (l.rpos == r.rpos);
+	}
+	else if (posNodeId(l) != -1 && posNodeId(r) != -1) {
+		return posNodeId(l) == posNodeId(r);
+	}
+	else {
+		return false;
+	}
+}
+
 void Map::loadFromFile(const string& filename)
 {
 	std::ifstream t(filename);

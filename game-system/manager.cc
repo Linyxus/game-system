@@ -1,4 +1,6 @@
 #include "manager.h"
+#include <cmath>
+using namespace std;
 
 Random::Random()
 {
@@ -28,6 +30,42 @@ Manager::Manager()
 
 void Manager::run()
 {
+	while (true) {
+		bool ended = true;
+		for (int i = 0; i < m_cars.size(); i++) {
+			if (m_recorder.status(i) == Recorder::OUT || m_recorder.status(i) == Recorder::REACH)
+				continue;
+			ended = false;
+			Car& car = m_cars[i];
+			double sr = car.speedRate();
+			if (!car.turnable())
+				continue;
+			int step = random.randPoint();
+			step = round(double(step) * sr);
+			Path path = car.decidePath(step);
+			for (int ip = 0; ip < m_places.size(); ip++) {
+				Manager::PlaceStatus ps = getPlaceStatus(m_places[ip], path);
+				if (ps == Manager::LEAVE) {
+					m_places[i]->onLeave(car, path);
+				}
+				if (ps == Manager::VISIT) {
+					m_places[i]->onVisit(car, path);
+				}
+				if (ps == Manager::STAY) {
+					m_places[i]->onStay(car, path);
+				}
+				if (ps == Manager::PASS) {
+					m_places[i]->onPass(car, path);
+				}
+			}
+			if (car.outed) {
+				m_recorder.setStatus(i, Recorder::OUT);
+			}
+			if (m_map->posEqual(car.pos, m_dest) {
+				m_recorder.setStatus(i, Recorder::REACH);
+			}
+		}
+	}
 }
 
 Manager::PlaceStatus Manager::getPlaceStatus(Place* place, Path path) const
@@ -83,4 +121,34 @@ Manager::PlaceStatus Manager::getPlaceStatus(Range place, Path path) const
 			return Manager::PlaceStatus::NONE;
 	}
 	return Manager::PlaceStatus::NONE;
+}
+
+Recorder::Recorder()
+{
+}
+
+void Recorder::output() const
+{
+}
+
+void Recorder::addRecord(int index, Record record)
+{
+	m_records[index].push_back(record);
+}
+
+int Recorder::addCar()
+{
+	m_records.push_back(Recorder::Records());
+	m_status.push_back(Recorder::RUN);
+	return m_records.size() - 1;
+}
+
+void Recorder::setStatus(int index, CarStatus cs)
+{
+	m_status[index] = cs;
+}
+
+Recorder::CarStatus Recorder::status(int index) const
+{
+	return m_status[index];
 }
