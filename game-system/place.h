@@ -61,27 +61,3 @@ public:
 	void onStay(Car&, Path) {}
 	double diffic() const { return 0.0; }
 };
-
-class CrossRoad : public Place
-{
-public:
-	void onPass(Car, Path) {
-		cout << "A car pass by CrossRoad!" << endl;
-	}
-	void onVisited(Car, Path) {
-		m_range.loadFromString("123");
-		cout << "A car visited CrossRoad!" << endl;
-	}
-};
-
-class Slower : public Place
-{
-public:
-	void onPass(Car, Path) {
-		cout << "A car pass by Slower!" << endl;
-	}
-	void onVisit(Car, Path) {
-		m_range.loadFromString("123");
-		cout << "A car visited Slower!" << endl;
-	}
-};

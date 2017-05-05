@@ -38,14 +38,17 @@ public:
 	typedef vector<Record> Records;
 	enum CarStatus {OUT, REACH, RUN};
 	Recorder();
-	void output() const;
+	void output(string fn) const;
 	void addRecord(int, Record);
 	int addCar();
 	void setStatus(int, CarStatus);
+	void setRanking(int, int);
 	CarStatus status(int) const;
+	int ranking(int) const;
 private:
 	vector<Records> m_records;
 	vector<CarStatus> m_status;
+	vector<int> m_rankings;
 };
 
 class Manager
@@ -53,18 +56,22 @@ class Manager
 public:
 	enum PlaceStatus {STAY, LEAVE, VISIT, PASS, NONE};
 	Manager();
+	~Manager();
 	Random random;
 	void run();
+	void init(Map* map, int cars, vector<Position> poss, vector<Controller*> ctls, Car initialCar);
+	void initFromFile(Map *, string);
 	PlaceStatus getPlaceStatus(Place*, Path) const;
 	PlaceStatus getPlaceStatus(Range, Path) const;
-	void setMap(Map* map) { m_map = map; }
-	Map* map() { return m_map; }
-	void setDest(Position pos) { m_dest = pos; }
-	Position dest() const { return m_dest; }
-private:
 	Map* m_map;
-	Position m_dest;
+	Position dest;
+	double caculateDiffic(Path) const;
+	void _DISPLAY_CARS() const;
+	vector<Car> cars() const { return m_cars; }
+	const Recorder& recorder() const { return m_recorder; }
+private:
 	vector<Place*> m_places;
 	Recorder m_recorder;
 	vector<Car> m_cars;
+	vector<Controller*> m_ctls;
 };

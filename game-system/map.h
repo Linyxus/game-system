@@ -85,9 +85,6 @@ public:
 	bool posInPath(Position, Path) const;
 	bool posEqual(Position, Position) const;
 private:
-	int* d;
-	int* p;
-	int* inq;
 	vector<Road> m_roads;
 	vector<Node> m_nodes;
 };

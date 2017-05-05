@@ -39,15 +39,27 @@ bool Car::decideEvent(string id) const
 	return controller->decideEvent(id);
 }
 
-Path AI::decidePath(int step) const
+bool Car::outed() const
 {
-	return this->m_parent->manager()->map()->queryPath(
-		this->m_parent->pos,
-		this->m_parent->manager()->dest(),
-		step);
+	bool b = false;
+	if (this->m_coins < 0)
+		b = true;
+	if (this->m_credits <= 0)
+		b = true;
+	return b;
 }
 
-bool AI::decideEvent(string id) const
+Path AI::decidePath(int step)
+{
+	Car * p = m_parent;
+	Manager * m = p->manager();
+	Map * map = m->m_map;
+	Position pos = m_parent->pos;
+	Position dest = m_parent->manager()->dest;
+	return map->queryPath(pos, dest, step);
+}
+
+bool AI::decideEvent(string id)
 {
 	return m_parent->hitted(this->prob);
 }

@@ -10,7 +10,7 @@ class Controller;
 class Car
 {
 public:
-	Car(Manager* parent) { m_manager = parent; outed = false; }
+	Car(Manager* parent) { m_manager = parent; m_stopTurns = 0; m_rateTurns = 0; }
 	enum Status {BROKEN, SPEEDED, HIGHWAY};
 	bool turnable();
 	double speedRate();
@@ -23,16 +23,17 @@ public:
 	int credits() const { return m_credits; }
 	void setCredits(int credits) { m_credits = credits; }
 	bool hitted(double prob);
-	Manager* manager() const { return m_manager; }
+	Manager* manager() { return m_manager; }
+	void setManager(Manager * manager) { m_manager = manager; }
 	Position pos;
 	Path decidePath(int step) const;
 	bool decideEvent(string id) const;
 	Controller* controller;
-	bool outed;
+	bool outed() const;
 private:
 	int m_stopTurns;
 	double m_speedrate;
-	double m_rateTurns;
+	int m_rateTurns;
 	Status m_status;
 	int m_coins;
 	int m_credits;
@@ -42,17 +43,19 @@ private:
 class Controller
 {
 public:
+	Controller() { }
 	Controller(Car* parent) { m_parent = parent; }
-	virtual Path decidePath(int step) const = 0;
-	virtual bool decideEvent(string) const = 0;
+	virtual Path decidePath(int step) = 0;
+	virtual bool decideEvent(string) = 0;
 	double prob;
-protected:
 	Car* m_parent;
 };
 
 class AI : public Controller
 {
 public:
-	Path decidePath(int step) const;
-	bool decideEvent(string) const;
+	AI() : Controller() {}
+	AI(Car * parent) : Controller(parent) {}
+	Path decidePath(int step);
+	bool decideEvent(string);
 };
