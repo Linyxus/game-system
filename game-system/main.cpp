@@ -47,13 +47,25 @@ int main()
 	manager.initFromFile(&map, stfn);
 	cout << "Manager inited." << endl;
 	manager._DISPLAY_CARS();
-	try {
+	cout << ">>> Enter times to simulate: ";
+	int N;
+	cin >> N;
+	cout << ">>> Enter file path to save: ";
+	string sfn;
+	cin >> sfn;
+	bool first = true;
+	for (int i = 0; i < N; i++) {
 		manager.run();
+		if (first) {
+			manager.recorder().output(sfn);
+			first = false;
+		}
+		else {
+			manager.recorder().append(sfn);
+		}
+		manager = Manager();
+		manager.initFromFile(&map, stfn);
 	}
-	catch (string str) {
-		cout << str << endl;
-	}
-	manager.recorder().output("f:/out.txt");
 
 	system("PAUSE>NUL");
 	return 0;

@@ -39,6 +39,7 @@ public:
 	enum CarStatus {OUT, REACH, RUN};
 	Recorder();
 	void output(string fn) const;
+	void append(string fn) const;
 	void addRecord(int, Record);
 	int addCar();
 	void setStatus(int, CarStatus);

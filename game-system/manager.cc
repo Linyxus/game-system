@@ -42,8 +42,11 @@ template<typename T>
 double _SUM(const T& vec)
 {
 	double s = 0.0;
-	for (auto it = vec.begin(); it != vec.end(); it++)
-		s += *it;
+	for (auto it = vec.begin(); it != vec.end(); it++) {
+		if (*it != -1) {
+			s += (*it);
+		}
+	}
 	return s;
 }
 
@@ -66,11 +69,11 @@ void Manager::run()
 		vector<double> diffics;
 		vector<double> probs;
 		for (int i = 0; i < m_cars.size(); i++) {
-			lens.push_back(0);
-			credits.push_back(0);
-			coins.push_back(0);
-			diffics.push_back(0.0);
-			probs.push_back(0.0);
+			lens.push_back(-1);
+			credits.push_back(-1);
+			coins.push_back(-1);
+			diffics.push_back(-1);
+			probs.push_back(-1);
 		}
 		for (int i = 0; i < m_cars.size(); i++) {
 			if (m_recorder.status(i) == Recorder::OUT || m_recorder.status(i) == Recorder::REACH)
@@ -126,6 +129,7 @@ void Manager::run()
 		}
 		else {
 			for (int i = 0; i < m_cars.size(); i++) {
+				if (probs[i] == -1) continue;
 				Record rec;
 				rec.coins = coins[i];
 				rec.pcoins = _GET_P(coins, i);
@@ -293,6 +297,34 @@ void Recorder::output(string fn) const
 		const Records &recs = m_records[i];
 		for (int j = 0; j < recs.size(); j++) {
 			Record rec = recs[j];
+			fout << rec.prob << ","
+				<< rec.pprob << ","
+				<< rec.length << ","
+				<< rec.plength << ","
+				<< rec.diffic << ","
+				<< rec.pdiffic << ","
+				<< rec.coins << ","
+				<< rec.pcoins << ","
+				<< rec.credits << ","
+				<< rec.pcredits << ","
+				<< ranking(i) << ","
+				<< ((status(i) == Recorder::OUT) ? 1 : 0)
+				<< endl;
+		}
+	}
+	fout.close();
+}
+
+void Recorder::append(string fn) const
+{
+	ofstream fout;
+	fout.open(fn, ios_base::app);
+	//fout << "prob,pprob,len,plen,diffic,pdiffic,coins,pcoins,credits,pcredits,outcome,outed" << endl;
+	for (int i = 0; i < m_records.size(); i++) {
+		const Records &recs = m_records[i];
+		for (int j = 0; j < recs.size(); j++) {
+			Record rec = recs[j];
+			if (rec.plength == 0)
 			fout << rec.prob << ","
 				<< rec.pprob << ","
 				<< rec.length << ","
