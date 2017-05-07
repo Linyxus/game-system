@@ -11,7 +11,7 @@ class Car
 {
 public:
 	Car(Manager* parent) { m_manager = parent; m_stopTurns = 0; m_rateTurns = 0; }
-	enum Status {BROKEN, SPEEDED, HIGHWAY};
+	enum Status {BROKEN, SLOWERED, HIGHWAY};
 	bool turnable();
 	double speedRate();
 	void setStopTurns(int t) { m_stopTurns = t; }

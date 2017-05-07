@@ -26,7 +26,7 @@ double Car::speedRate()
 bool Car::hitted(double prob)
 {
 	int p = prob * 100;
-	return m_manager->random.hitted(p);
+	return m_manager->random->hitted(p);
 }
 
 Path Car::decidePath(int step) const

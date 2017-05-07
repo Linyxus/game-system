@@ -1,4 +1,5 @@
 #include "place.h"
+#include "manager.h"
 #include <sstream>
 using namespace std;
 
@@ -30,6 +31,24 @@ void Range::loadFromString(string str)
 		throw string("Range::loadFromString bad string inputed!");
 }
 
+void Range::loadFromSStream(stringstream & ss)
+{
+	int n, m;
+	ss >> n >> m;
+	for (int i = 0; i < n; i++) {
+		int p;
+		ss >> p;
+		m_nodes[p] = 1;
+	}
+	for (int i = 0; i < m; i++) {
+		int p;
+		ss >> p;
+		m_roads[p] = 1;
+	}
+	if (!ss)
+		throw string("Range::loadFromString bad string inputed!");
+}
+
 bool Range::in(Position pos) const
 {
 	if (m_parent->posNodeId(pos) == -1) {
@@ -44,6 +63,11 @@ void Place::loadRange(string str)
 	m_range.loadFromString(str);
 }
 
+void Place::loadRange(stringstream & ss)
+{
+	m_range.loadFromSStream(ss);
+}
+
 bool Place::in(Position pos) const
 {
 	return m_range.in(pos);
@@ -54,6 +78,12 @@ Punisher::Punisher(Manager * manager)
 	m_manager = manager;
 }
 
-void Punisher::common(Car car)
+void Punisher::common(Car & car)
 {
+	if (m_manager->random->hitted(30)) {
+		car.setSpeedRate(0.5, 5);
+	}
+	if (m_manager->random->hitted(50)) {
+		car.setStopTurns(5);
+	}
 }

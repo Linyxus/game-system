@@ -66,24 +66,25 @@ void Manager::run()
 		vector<int> lens;
 		vector<int> credits;
 		vector<int> coins;
-		vector<double> diffics;
+		//vector<double> diffics;
 		vector<double> probs;
 		for (int i = 0; i < m_cars.size(); i++) {
 			lens.push_back(-1);
 			credits.push_back(-1);
 			coins.push_back(-1);
-			diffics.push_back(-1);
+			//diffics.push_back(-1);
 			probs.push_back(-1);
 		}
 		for (int i = 0; i < m_cars.size(); i++) {
 			if (m_recorder.status(i) == Recorder::OUT || m_recorder.status(i) == Recorder::REACH)
 				continue;
 			ended = false;
+			m_recorder.newTurn(i);
 			Car& car = m_cars[i];
 			double sr = car.speedRate();
 			if (!car.turnable())
 				continue;
-			int step = random.randPoint();
+ 			int step = random->randPoint();
 			step = round(double(step) * sr);
 			Path path = car.decidePath(step);
 			car.pos = path.positions[path.positions.size() - 1];
@@ -113,16 +114,12 @@ void Manager::run()
 			//caculate shortest path
 			Path sp = m_map->caculatePath(car.pos, dest);
 			int len = m_map->pathLen(sp);
-			double diffic = caculateDiffic(sp);
+			//double diffic = caculateDiffic(sp);
 			lens[i] = len;
-			diffics[i] = diffic;
+			//diffics[i] = diffic;
 			coins[i] = car.coins();
 			credits[i] = car.credits();
 			probs[i] = car.controller->prob;
-
-			cout << "Round #" << r++ << endl;
-			_DISPLAY_CARS();
-			cout << endl;
 		}
 		if (ended) {
 			break;
@@ -137,8 +134,8 @@ void Manager::run()
 				rec.pcredits = _GET_P(credits, i);
 				rec.length = lens[i];
 				rec.plength = _GET_P(lens, i);
-				rec.diffic = diffics[i];
-				rec.pdiffic = _GET_P(diffics, i);
+				//rec.diffic = diffics[i];
+				//rec.pdiffic = _GET_P(diffics, i);
 				rec.prob = probs[i];
 				rec.pprob = _GET_P(probs, i);
 				m_recorder.addRecord(i, rec);
@@ -291,8 +288,8 @@ Recorder::Recorder()
 void Recorder::output(string fn) const
 {
 	ofstream fout;
-	fout.open(fn);
-	fout << "prob,pprob,len,plen,diffic,pdiffic,coins,pcoins,credits,pcredits,outcome,outed" << endl;
+	fout.open(fn, ios_base::app);
+	fout << "prob,pprob,len,plen,coins,pcoins,credits,pcredits,outcome,outed" << endl;
 	for (int i = 0; i < m_records.size(); i++) {
 		const Records &recs = m_records[i];
 		for (int j = 0; j < recs.size(); j++) {
@@ -301,8 +298,8 @@ void Recorder::output(string fn) const
 				<< rec.pprob << ","
 				<< rec.length << ","
 				<< rec.plength << ","
-				<< rec.diffic << ","
-				<< rec.pdiffic << ","
+				//<< rec.diffic << ","
+				//<< rec.pdiffic << ","
 				<< rec.coins << ","
 				<< rec.pcoins << ","
 				<< rec.credits << ","
@@ -319,7 +316,7 @@ void Recorder::append(string fn) const
 {
 	ofstream fout;
 	fout.open(fn, ios_base::app);
-	//fout << "prob,pprob,len,plen,diffic,pdiffic,coins,pcoins,credits,pcredits,outcome,outed" << endl;
+	fout << "prob,pprob,len,plen,coins,pcoins,credits,pcredits,outcome,outed" << endl;
 	for (int i = 0; i < m_records.size(); i++) {
 		const Records &recs = m_records[i];
 		for (int j = 0; j < recs.size(); j++) {
@@ -329,8 +326,8 @@ void Recorder::append(string fn) const
 				<< rec.pprob << ","
 				<< rec.length << ","
 				<< rec.plength << ","
-				<< rec.diffic << ","
-				<< rec.pdiffic << ","
+				//<< rec.diffic << ","
+				//<< rec.pdiffic << ","
 				<< rec.coins << ","
 				<< rec.pcoins << ","
 				<< rec.credits << ","
@@ -353,6 +350,7 @@ int Recorder::addCar()
 	m_records.push_back(Recorder::Records());
 	m_status.push_back(Recorder::RUN);
 	m_rankings.push_back(0);
+	m_turns.push_back(0);
 	return m_records.size() - 1;
 }
 
@@ -374,4 +372,22 @@ Recorder::CarStatus Recorder::status(int index) const
 int Recorder::ranking(int index) const
 {
 	return m_rankings[index];
+}
+
+int Recorder::result(int index) const
+{
+	if (m_status[index] == Recorder::OUT)
+		return -1;
+	else
+		return m_rankings[index];
+}
+
+int Recorder::turns(int index) const
+{
+	return m_turns[index];
+}
+
+void Recorder::newTurn(int index)
+{
+	m_turns[index]++;
 }

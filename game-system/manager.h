@@ -46,9 +46,13 @@ public:
 	void setRanking(int, int);
 	CarStatus status(int) const;
 	int ranking(int) const;
+	int result(int) const;
+	int turns(int) const;
+	void newTurn(int);
 private:
 	vector<Records> m_records;
 	vector<CarStatus> m_status;
+	vector<int> m_turns;
 	vector<int> m_rankings;
 };
 
@@ -58,7 +62,7 @@ public:
 	enum PlaceStatus {STAY, LEAVE, VISIT, PASS, NONE};
 	Manager();
 	~Manager();
-	Random random;
+	Random * random;
 	void run();
 	void init(Map* map, int cars, vector<Position> poss, vector<Controller*> ctls, Car initialCar);
 	void initFromFile(Map *, string);
@@ -70,6 +74,7 @@ public:
 	void _DISPLAY_CARS() const;
 	vector<Car> cars() const { return m_cars; }
 	const Recorder& recorder() const { return m_recorder; }
+	void addPlace(Place* place) { m_places.push_back(place); }
 private:
 	vector<Place*> m_places;
 	Recorder m_recorder;
