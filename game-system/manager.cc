@@ -106,13 +106,13 @@ void Manager::run()
 			if (car.outed()) {
 				m_recorder.setStatus(i, Recorder::OUT);
 			}
-			if (m_map->posEqual(car.pos, dest)) {
+			if (m_map->posEqual(car.pos, car.dest)) {
 				m_recorder.setStatus(i, Recorder::REACH);
 				m_recorder.setRanking(i, arred++);
 			}
 
 			//caculate shortest path
-			Path sp = m_map->caculatePath(car.pos, dest);
+			Path sp = m_map->caculatePath(car.pos, car.dest);
 			int len = m_map->pathLen(sp);
 			//double diffic = caculateDiffic(sp);
 			lens[i] = len;
@@ -153,6 +153,7 @@ void Manager::init(Map * map, int cars, vector<Position> poss, vector<Controller
 		m_cars[i].pos = poss[i];
 		m_cars[i].controller = ctls[i];
 		m_cars[i].setManager(this);
+		m_cars[i].dest = dest[i];
 	}
 	for (int i = 0; i < cars; i++) {
 		m_cars[i].controller->m_parent = &(m_cars[i]);
@@ -191,12 +192,17 @@ void Manager::initFromFile(Map * map, string fn)
 	Car car(this);
 	car.setCoins(iniCoins);
 	car.setCredits(iniCredits);
-	init(map, n, poses, m_ctls, car);
 
-	int rid, rpos;
-	ss >> rid >> rpos;
-	dest.rid = rid;
-	dest.rpos = rpos;
+	for (int i = 0; i < n; i++) {
+		int rid, rpos;
+		ss >> rid >> rpos;
+		Position pos;
+		pos.rid = rid;
+		pos.rpos = rpos;
+		dest.push_back(pos);
+	}
+
+	init(map, n, poses, m_ctls, car);
 }
 
 Manager::PlaceStatus Manager::getPlaceStatus(Place* place, Path path) const
@@ -276,8 +282,8 @@ void Manager::_DISPLAY_CARS() const
 		cout << "Coins: " << m_cars[i].coins() << endl;
 		cout << "Credits: " << m_cars[i].credits() << endl;
 		cout << "Position: " << m_cars[i].pos.rid << ", " << m_cars[i].pos.rpos << endl;
+		cout << "Destnation: " << dest[i].rid << ", " << dest[i].rpos << endl;
 	}
-	cout << "<<<< Destnation: " << dest.rid << ", " << dest.rpos << endl;
 	cout << endl;
 }
 

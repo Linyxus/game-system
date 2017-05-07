@@ -4,6 +4,7 @@
 #include <fstream>
 #include "manager.h"
 #include <cstdlib>
+#include <array>
 using namespace std;
 
 void _DISPLAY_PS(Manager::PlaceStatus ps)
@@ -68,7 +69,7 @@ int main()
 	}
 
 	//load testplace
-	cout << ">>> Enter test place data file path (d as default: E:/data/tp.txt): ";
+	cout << ">>> Enter crossroad data file path (d as default: E:/data/tp.txt): ";
 	string tpfn;
 	cin >> tpfn;
 	if (tpfn == "d") {
@@ -81,9 +82,17 @@ int main()
 	cout << ">>> Enter file path to save: ";
 	string sfn;
 	cin >> sfn;
-	bool first = true;
-	vector<int> res15;
-	vector<int> res80;
+	
+	//main body
+	//___test function
+	vector<double> probs = { 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9 };
+	array<int, 9> sumturns;
+	array<int, 9> times;
+	for (int i = 0; i < sumturns.size(); i++) {
+		times[i] = 0;
+		sumturns[i] = 0;
+	}
+	//___
 	for (int i = 0; i < N; i++) {
 		if (i % 10 == 0) {
 			cout << i << " / " << N << endl;
@@ -92,24 +101,26 @@ int main()
 		Punisher punisher(&manager);
 		manager.random = &random;
 		manager.initFromFile(&map, stfn);
-		//tp load
-		vector<TestPlace> tps;
+		//crossroad load
+		vector<CrossRoad> tps;
 		loadPlace(manager, &punisher, tpfn, tps);
+		//___test function
+		manager._SET_PROB(0, probs[i % 9]);
+		//___
 		manager.run();
-		manager.recorder().output(sfn);
-		res15.push_back(manager.recorder().result(0));
-		res80.push_back(manager.recorder().result(1));
-	}
-	int sum15 = 0, sum80 = 0;
-	for (int i = 0; i < res15.size(); i++)
-		if (res15[i] == 0)
-			sum15++;
-	for (int i = 0; i < res80.size(); i++)
-		if (res80[i] == 0)
-			sum80++;
-	cout << "15%: " << double(sum15) / double(N) << endl;
-	cout << "80%: " << double(sum80) / double(N) << endl;
+		//manager.recorder().output(sfn); DISABLED
 
+		//___test function
+		times[i % 9]++;
+		sumturns[i % 9] += manager.recorder().turns(0);
+		//___
+	}
+
+	//___test function
+	for (int i = 0; i < probs.size(); i++) {
+		cout << probs[i] << " average turns : " << double(sumturns[i]) / double(times[i]) << endl;
+	}
+	//___
 	system("PAUSE>NUL");
 	return 0;
 }

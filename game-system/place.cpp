@@ -81,9 +81,13 @@ Punisher::Punisher(Manager * manager)
 void Punisher::common(Car & car)
 {
 	if (m_manager->random->hitted(30)) {
+		cout << "One car is slowered by me!" << endl
+			<< "Probability: " << car.controller->prob << endl;
 		car.setSpeedRate(0.5, 5);
 	}
 	if (m_manager->random->hitted(50)) {
+		cout << "One car is stopped by me!" << endl
+			<< "Probability: " << car.controller->prob << endl;
 		car.setStopTurns(5);
 	}
 }

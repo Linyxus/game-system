@@ -26,6 +26,7 @@ public:
 	Manager* manager() { return m_manager; }
 	void setManager(Manager * manager) { m_manager = manager; }
 	Position pos;
+	Position dest;
 	Path decidePath(int step) const;
 	bool decideEvent(string id) const;
 	Controller* controller;

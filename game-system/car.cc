@@ -54,8 +54,8 @@ Path AI::decidePath(int step)
 	Car * p = m_parent;
 	Manager * m = p->manager();
 	Map * map = m->m_map;
+	Position dest = m_parent->dest;
 	Position pos = m_parent->pos;
-	Position dest = m_parent->manager()->dest;
 	return map->queryPath(pos, dest, step);
 }
 

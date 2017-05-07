@@ -56,11 +56,11 @@ protected:
 	Punisher* punish;
 };
 
-class TestPlace : public Place
+class CrossRoad : public Place
 {
 public:
-	TestPlace(Map* parent, Punisher* punisher) : Place(parent, punisher) {}
-	TestPlace(Map* parent) : Place(parent) {}
+	CrossRoad(Map* parent, Punisher* punisher) : Place(parent, punisher) {}
+	CrossRoad(Map* parent) : Place(parent) {}
 	void onPass(Car&, Path) {
 		//cout << "Car pass." << endl;
 	}

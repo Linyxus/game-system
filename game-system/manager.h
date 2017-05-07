@@ -69,12 +69,13 @@ public:
 	PlaceStatus getPlaceStatus(Place*, Path) const;
 	PlaceStatus getPlaceStatus(Range, Path) const;
 	Map* m_map;
-	Position dest;
+	vector<Position> dest;
 	double caculateDiffic(Path) const;
 	void _DISPLAY_CARS() const;
 	vector<Car> cars() const { return m_cars; }
 	const Recorder& recorder() const { return m_recorder; }
 	void addPlace(Place* place) { m_places.push_back(place); }
+	void _SET_PROB(int index, double prob) { m_cars[index].controller->prob = prob; }
 private:
 	vector<Place*> m_places;
 	Recorder m_recorder;
